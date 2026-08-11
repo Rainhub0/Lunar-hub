@@ -4,17 +4,34 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
     VirtualUser:CaptureController()
     VirtualUser:ClickButton2(Vector2.new())
 end)
+-- ==================== ЗАГРУЗКА БИБЛИОТЕК ====================
+local repo = "https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/"
 
--- ==================== ЗАГРУЗКА ОСНОВНОГО СКРИПТА (БЕЗ АВТОРИЗАЦИИ) ====================
-local function LoadMainScript()
-    -- ==================== ЗАГРУЗКА БИБЛИОТЕК ====================
-    local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Rainhub0/58588fc52c695feec2489c30c689c360/raw/480a043a154529b42ba0bf8cd9d8d0779bc20a24/gistfile1.txt"))()
-    local ThemeManager = loadstring(game:HttpGet("https://gist.githubusercontent.com/Rainhub0/97b84c90469bf93f11299098817ab9e6/raw/80461129799c6a3d4c539b8dcd10073fe6eea22d/gistfile1.txt"))()
-    local SaveManager = loadstring(game:HttpGet("https://gist.githubusercontent.com/Rainhub0/438f7f9b898ef88f891d3daa9bafb3aa/raw/2a3964b8c3fda8aa2c20b0af80a1fccc54afb0f6/gistfile1.txt"))()
+local function loadLib(path)
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet(repo .. path))()
+    end)
+    
+    if not success then
+        warn("[Library Load Error] " .. path .. " → " .. tostring(result))
+        return nil
+    end
+    
+    return result
+end
 
-    Library.GetIcon = function() end
-    Library.GetCustomIcon = function() return nil end
+local Library = loadLib("Library.lua")
+local ThemeManager = loadLib("addons/ThemeManager.lua")
+local SaveManager = loadLib("addons/SaveManager.lua")
 
+if not Library then
+    error("Failed to load Linoria Library! Check console for the real error.")
+end
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+Library.GetIcon = function() end
+Library.GetCustomIcon = function() return nil end
     -- ==================== СЕРВИСЫ ====================
     local UserInputService = game:GetService("UserInputService")
     local RunService       = game:GetService("RunService")
@@ -30,8 +47,6 @@ local function LoadMainScript()
     local LocalPlayer = Players.LocalPlayer
     local Camera      = Workspace.CurrentCamera
     local Mouse       = LocalPlayer:GetMouse()
-    local Toggles     = Library.Toggles
-    local Options     = Library.Options
 
     -- ==================== АЛИАСЫ ====================
     local WorldToViewportPoint    = function(pos) return Camera:WorldToViewportPoint(pos) end
@@ -81,14 +96,11 @@ local function LoadMainScript()
 
     -- ==================== РЕЕСТР ВНЕШНИХ СКРИПТОВ ====================
     local ScriptRegistry = {
-        Dex           = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub-/refs/heads/main/Dex" },
-        WorldESP      = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub-/refs/heads/main/world%20esp" },
-        InfiniteYield = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub-/refs/heads/main/Infinite%20yield" },
-        Cobalt        = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub-/refs/heads/main/Cobalt" },
-        SimpleSpy     = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub-/refs/heads/main/SimpleSpy3" },
-        Shaders       = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub-/refs/heads/main/Shaders" },
-        Fishing       = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub-/refs/heads/main/Fishing%20script" },
-        Animation     = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub-/refs/heads/main/Animation%20script" },
+        Dex           = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Dex.luau" },
+        InfiniteYield = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Infinite%20Yield.luau" },
+        Cobalt        = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Cobalt.luau" },
+        SimpleSpy     = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Shaders.luau" },
+        Shaders       = { Url = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Shaders.luau" },
     }
 
     -- ==================== КОНФИГУРАЦИЯ ====================
@@ -2485,463 +2497,6 @@ end
     -- TAB: SCRIPTS
     -- ============================
     local RegistryLeft  = Tabs.Scripts:AddLeftGroupbox('External Software')
-    local RegistryRight = Tabs.Scripts:AddRightGroupbox('Fishing (Only for RefineryCaves 2)')
-    local FishingGroup  = RegistryRight
-
-    _G.FishingLoaded  = _G.FishingLoaded  or false
-    _G.WorldESPLoaded = _G.WorldESPLoaded or false
-
-    -- Fishing Toggle
-    local FishingToggle = FishingGroup:AddToggle('FishingToggle', {
-        Text = 'Auto-Fishing',
-        Default = false,
-        Visible = true,
-        Callback = function(v)
-            if _G.FishingConfig then
-                _G.FishingConfig.Enabled = v
-                if _G.ToggleFishing then _G.ToggleFishing(v) end
-            else
-                _G.FishingConfig = { Enabled = v }
-            end
-        end,
-    })
-
-    local FishingWaitBite = FishingGroup:AddSlider('FishingWaitBite', {
-        Text = 'Bite Wait Timeout (сек)',
-        Default = 4.5,
-        Min = 0,
-        Max = 10,
-        Rounding = 1,
-        Visible = false,
-        Callback = function(v)
-            if not _G.FishingConfig then _G.FishingConfig = {} end
-            _G.FishingConfig.WaitBite = v
-        end,
-    })
-    local FishingReelDuration = FishingGroup:AddSlider('FishingReelDuration', {
-        Text = 'Reel Duration (сек)',
-        Default = 2,
-        Min = 0,
-        Max = 10,
-        Rounding = 1,
-        Visible = false,
-        Callback = function(v)
-            if not _G.FishingConfig then _G.FishingConfig = {} end
-            _G.FishingConfig.ReelDuration = v
-        end,
-    })
-    local FishingHitInterval = FishingGroup:AddSlider('FishingHitInterval', {
-        Text = 'Click Interval (сек)',
-        Default = 0.12,
-        Min = 0.01,
-        Max = 1,
-        Rounding = 3,
-        Visible = false,
-        Callback = function(v)
-            if not _G.FishingConfig then _G.FishingConfig = {} end
-            _G.FishingConfig.HitInterval = v
-        end,
-    })
-    local FishingResetDelay = FishingGroup:AddSlider('FishingResetDelay', {
-        Text = 'Reset Delay (сек)',
-        Default = 0.2,
-        Min = 0,
-        Max = 5,
-        Rounding = 1,
-        Visible = false,
-        Callback = function(v)
-            if not _G.FishingConfig then _G.FishingConfig = {} end
-            _G.FishingConfig.ResetDelay = v
-        end,
-    })
-    local FishingZoneDropdown = FishingGroup:AddDropdown('FishingZoneDropdown', {
-        Text = 'Зона ловли',
-        Values = {"По умолчанию"},
-        Default = 1,
-        Visible = false,
-        Callback = function(v)
-            if not _G.FishingConfig then _G.FishingConfig = {} end
-            _G.FishingConfig.SelectedZone = v
-        end,
-    })
-    local RefreshZonesButton = FishingGroup:AddButton({
-        Text = 'Обновить список зон',
-        Visible = false,
-        Func = function()
-            local list = {"По умолчанию"}
-            local fishZones = Workspace:FindFirstChild("MouseIgnore") and Workspace.MouseIgnore:FindFirstChild("FishZones")
-            if fishZones then
-                for _, zone in ipairs(fishZones:GetChildren()) do
-                    if not table.find(list, zone.Name) then table.insert(list, zone.Name) end
-                end
-            end
-            if FishingZoneDropdown then
-                FishingZoneDropdown:SetValues(list)
-                FishingZoneDropdown:SetValue("По умолчанию")
-            end
-            Library:Notify("Список зон обновлён", 2)
-        end
-    })
-    local TeleportToZoneButton = FishingGroup:AddButton({
-        Text = 'Телепорт к выбранной зоне',
-        Visible = false,
-        Func = function()
-            local selectedZone = _G.FishingConfig and _G.FishingConfig.SelectedZone
-            if selectedZone and selectedZone ~= "По умолчанию" then
-                if _G.TeleportTo then
-                    local success = _G.TeleportTo(selectedZone)
-                    Library:Notify(success and ("Телепортирован к: " .. selectedZone) or "Не удалось телепортироваться", 2)
-                else
-                    Library:Notify("Ошибка: скрипт рыбалки не загружен!", 2)
-                end
-            else
-                Library:Notify("Выберите зону из списка!", 2)
-            end
-        end
-    })
-    local AutoTeleportToggle = FishingGroup:AddToggle('AutoTeleportToggle', {
-        Text = 'Авто-ТП к зоне при ловле',
-        Default = false,
-        Visible = false,
-        Callback = function(v)
-            if not _G.FishingConfig then _G.FishingConfig = {} end
-            _G.FishingConfig.AutoTeleportToZone = v
-        end,
-    })
-
-    FishingGroup:AddButton({
-        Text = 'Load Fishing Script',
-        Func = function()
-            if _G.FishingLoaded then Library:Notify('Скрипт фишинга уже загружен', 2); return end
-            RunRegisteredScript("Fishing")
-            _G.FishingLoaded = true
-            FishingToggle:SetVisible(true)
-            FishingWaitBite:SetVisible(true)
-            FishingReelDuration:SetVisible(true)
-            FishingHitInterval:SetVisible(true)
-            FishingResetDelay:SetVisible(true)
-            FishingZoneDropdown:SetVisible(true)
-            RefreshZonesButton:SetVisible(true)
-            TeleportToZoneButton:SetVisible(true)
-            AutoTeleportToggle:SetVisible(true)
-            Library:Notify('Скрипт фишинга загружен!', 3)
-        end
-    })
-
-    -- World ESP Tabbox
-    local ESPTabBox = Tabs.Scripts:AddRightTabbox()
-    local ESP = {
-        Ores = ESPTabBox:AddTab('Ores'),
-        Trees = ESPTabBox:AddTab('Trees'),
-        Fish = ESPTabBox:AddTab('Fish'),
-        Caves = ESPTabBox:AddTab('Caves'),
-        HitBoxes = ESPTabBox:AddTab('Hitbox'),
-    }
-
-    local oreFilter = ""
-    local treeFilter = ""
-    local OreDropdown, TreeDropdown, FishDropdown, CaveDropdown
-    local OreESPToggle, TreeESPToggle, FishESPToggle
-    local CaveNameInput = ""
-
-    -- Ores
-    ESP.Ores:AddInput('OreFilterInput', {
-        Text = 'Filter',
-        Placeholder = 'e.g. Gold...',
-        Callback = function(v)
-            oreFilter = v
-            if _G.GetOreList and OreDropdown then OreDropdown:SetValues(_G.GetOreList(v)) end
-        end
-    })
-    OreDropdown = ESP.Ores:AddDropdown('OreDropdown', {
-        Text = 'Select Ore',
-        Values = {},
-        Multi = false,
-        AllowNull = true,
-    })
-    ESP.Ores:AddButton({
-        Text = 'Refresh',
-        Func = function()
-            if _G.GetOreList then OreDropdown:SetValues(_G.GetOreList(oreFilter)) end
-        end
-    })
-    ESP.Ores:AddButton({
-        Text = 'Teleport to Selected',
-        Func = function()
-            if _G.TeleportToOre and OreDropdown and OreDropdown.Value then
-                _G.TeleportToOre(OreDropdown.Value)
-            end
-        end
-    })
-    ESP.Ores:AddButton({
-        Text = 'Add to ESP',
-        Func = function()
-            if not OreDropdown or not OreDropdown.Value then return end
-            local name = OreDropdown.Value:match("^(.-)%s*%[") or OreDropdown.Value
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.OreFilter[name] = true
-                _G.WorldESPConfig.OresEnabled = true
-                if OreESPToggle then OreESPToggle:SetValue(true) end
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-            Library:Notify("Added to ESP: " .. name, 2)
-        end
-    })
-    ESP.Ores:AddButton({
-        Text = 'Remove from ESP',
-        Func = function()
-            if not OreDropdown or not OreDropdown.Value then return end
-            local name = OreDropdown.Value:match("^(.-)%s*%[") or OreDropdown.Value
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.OreFilter[name] = nil
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-            Library:Notify("Removed from ESP: " .. name, 2)
-        end
-    })
-    OreESPToggle = ESP.Ores:AddToggle('OreESPToggle', {
-        Text = 'Ore ESP',
-        Default = false,
-        Callback = function(v)
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.OresEnabled = v
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-        end,
-    })
-    :AddColorPicker('OreESPColor', {
-        Default = Color3.fromRGB(255,200,0),
-        Callback = function(v)
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.OreColor = v
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-        end
-    })
-
-    -- Trees
-    ESP.Trees:AddInput('TreeFilterInput', {
-        Text = 'Filter',
-        Placeholder = 'e.g. Oak...',
-        Callback = function(v)
-            treeFilter = v
-            if _G.GetTreeList and TreeDropdown then TreeDropdown:SetValues(_G.GetTreeList(v)) end
-        end
-    })
-    TreeDropdown = ESP.Trees:AddDropdown('TreeDropdown', {
-        Text = 'Select Tree',
-        Values = {},
-        Multi = false,
-        AllowNull = true,
-    })
-    ESP.Trees:AddButton({
-        Text = 'Refresh',
-        Func = function()
-            if _G.GetTreeList then TreeDropdown:SetValues(_G.GetTreeList(treeFilter)) end
-        end
-    })
-    ESP.Trees:AddButton({
-        Text = 'Teleport to Selected',
-        Func = function()
-            if _G.TeleportToTree and TreeDropdown and TreeDropdown.Value then
-                _G.TeleportToTree(TreeDropdown.Value)
-            end
-        end
-    })
-    ESP.Trees:AddButton({
-        Text = 'Add to ESP',
-        Func = function()
-            if not TreeDropdown or not TreeDropdown.Value then return end
-            local name = TreeDropdown.Value:match("^(.-)%s*%[") or TreeDropdown.Value
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.TreeFilter[name] = true
-                _G.WorldESPConfig.TreesEnabled = true
-                if TreeESPToggle then TreeESPToggle:SetValue(true) end
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-            Library:Notify("Added to ESP: " .. name, 2)
-        end
-    })
-    ESP.Trees:AddButton({
-        Text = 'Remove from ESP',
-        Func = function()
-            if not TreeDropdown or not TreeDropdown.Value then return end
-            local name = TreeDropdown.Value:match("^(.-)%s*%[") or TreeDropdown.Value
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.TreeFilter[name] = nil
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-            Library:Notify("Removed from ESP: " .. name, 2)
-        end
-    })
-    TreeESPToggle = ESP.Trees:AddToggle('TreeESPToggle', {
-        Text = 'Tree ESP',
-        Default = false,
-        Callback = function(v)
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.TreesEnabled = v
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-        end,
-    })
-    :AddColorPicker('TreeESPColor', {
-        Default = Color3.fromRGB(0,255,100),
-        Callback = function(v)
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.TreeColor = v
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-        end
-    })
-
-    -- Fish
-    FishDropdown = ESP.Fish:AddDropdown('FishDropdown', {
-        Text = 'Select Fish',
-        Values = {},
-        Multi = false,
-        AllowNull = true,
-    })
-    ESP.Fish:AddButton({
-        Text = 'Refresh',
-        Func = function()
-            if _G.GetFishList then FishDropdown:SetValues(_G.GetFishList()) end
-        end
-    })
-    ESP.Fish:AddButton({
-        Text = 'Teleport to Selected',
-        Func = function()
-            if _G.TeleportToFish and FishDropdown and FishDropdown.Value then
-                _G.TeleportToFish(FishDropdown.Value)
-            end
-        end
-    })
-    FishESPToggle = ESP.Fish:AddToggle('FishESPToggle', {
-        Text = 'Big Fish ESP',
-        Default = false,
-        Callback = function(v)
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.FishEnabled = v
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-        end,
-    })
-    :AddColorPicker('FishESPColor', {
-        Default = Color3.fromRGB(0,200,255),
-        Callback = function(v)
-            if _G.WorldESPConfig then
-                _G.WorldESPConfig.FishColor = v
-                if _G.SaveESPConfig then _G.SaveESPConfig() end
-            end
-        end
-    })
-
-    -- Caves
-    ESP.Caves:AddInput('CaveNameInput', {
-        Text = 'Cave Name',
-        Placeholder = 'Enter name...',
-        Callback = function(v) CaveNameInput = v end
-    })
-    ESP.Caves:AddButton({
-        Text = 'Save Current Position',
-        Func = function()
-            if CaveNameInput ~= "" and _G.SaveCavePos then
-                _G.SaveCavePos(CaveNameInput)
-                Library:Notify("Saved: " .. CaveNameInput, 2)
-                if _G.GetCaveList and CaveDropdown then
-                    CaveDropdown:SetValues(_G.GetCaveList())
-                end
-            end
-        end
-    })
-    CaveDropdown = ESP.Caves:AddDropdown('CaveDropdown', {
-        Text = 'Select Cave',
-        Values = {},
-        Multi = false,
-        AllowNull = true,
-    })
-    ESP.Caves:AddButton({
-        Text = 'Teleport to Cave',
-        Func = function()
-            if _G.TeleportToCave and CaveDropdown and CaveDropdown.Value then
-                _G.TeleportToCave(CaveDropdown.Value)
-            end
-        end
-    })
-
-    -- Hitbox (Big Fish)
-    _G.Config = _G.Config or {}
-    _G.Config.FishHitbox = _G.Config.FishHitbox or { Enabled = false, Multiplier = 30, OriginalSizes = {} }
-
-    ESP.HitBoxes:AddToggle('BigFishHitboxToggle', {
-        Text = 'Enable BigFish Expander',
-        Default = _G.Config.FishHitbox.Enabled,
-        Callback = function(v)
-            _G.Config.FishHitbox.Enabled = v
-            if typeof(_G.updatrhitbox) == "function" then _G.updatrhitbox() end
-        end,
-    })
-    ESP.HitBoxes:AddSlider('BigFishHitboxSize', {
-        Text = 'Hitbox Size',
-        Default = 25,
-        Min = 5,
-        Max = 150,
-        Rounding = 0,
-        Callback = function(v)
-            if not _G.Config then _G.Config = {} end
-            if not _G.Config.FishHitbox then _G.Config.FishHitbox = {} end
-            _G.Config.FishHitbox.Size = Vector3.new(v,v,v)
-            if _G.Config.FishHitbox.Enabled and typeof(_G.updatrhitbox) == "function" then _G.updatrhitbox() end
-        end
-    })
-    ESP.HitBoxes:AddSlider('BigFishHitboxTrans', {
-        Text = 'Transparency',
-        Default = 0.7,
-        Min = 0,
-        Max = 1,
-        Rounding = 2,
-        Callback = function(v)
-            if not _G.Config then _G.Config = {} end
-            if not _G.Config.FishHitbox then _G.Config.FishHitbox = {} end
-            _G.Config.FishHitbox.Transparency = v
-            if _G.Config.FishHitbox.Enabled and typeof(_G.updatrhitbox) == "function" then _G.updatrhitbox() end
-        end
-    })
-
-    -- Загрузка WorldESP
-    ESP.Ores:AddButton({
-        Text = 'RefineryCaves 2 Script',
-        Func = function()
-            if _G.WorldESPLoaded then
-                Library:Notify('WorldESP уже загружен', 2)
-                return
-            end
-            RunRegisteredScript("WorldESP")
-            task.wait(1)
-            _G.WorldESPLoaded = true
-            if _G.WorldESPConfig then
-                if OreESPToggle  then OreESPToggle:SetValue(_G.WorldESPConfig.OresEnabled  or false) end
-                if TreeESPToggle then TreeESPToggle:SetValue(_G.WorldESPConfig.TreesEnabled or false) end
-                if FishESPToggle then FishESPToggle:SetValue(_G.WorldESPConfig.FishEnabled  or false) end
-            end
-            if _G.GetOreList  then OreDropdown:SetValues(_G.GetOreList(oreFilter))    end
-            if _G.GetTreeList then TreeDropdown:SetValues(_G.GetTreeList(treeFilter)) end
-            if _G.GetFishList then FishDropdown:SetValues(_G.GetFishList())           end
-            if _G.GetCaveList then CaveDropdown:SetValues(_G.GetCaveList())           end
-            Library:Notify("WorldESP loaded!", 3)
-        end
-    })
-
-    -- Автообновление списков
-    task.spawn(function()
-        while true do
-            task.wait(0.5)
-            if Library.Unloaded then break end
-            if _G.GetOreList  and OreDropdown  then OreDropdown:SetValues(_G.GetOreList(oreFilter))    end
-            if _G.GetTreeList and TreeDropdown then TreeDropdown:SetValues(_G.GetTreeList(treeFilter)) end
-            if _G.GetFishList and FishDropdown then FishDropdown:SetValues(_G.GetFishList())           end
-            if _G.GetCaveList and CaveDropdown then CaveDropdown:SetValues(_G.GetCaveList())           end
-        end
-    end)
 
     -- Внешние скрипты
     RegistryLeft:AddButton('Dark Dex V4',    function() RunRegisteredScript("Dex")           end)
@@ -2949,7 +2504,6 @@ end
     RegistryLeft:AddButton('Cobalt',         function() RunRegisteredScript("Cobalt")        end)
     RegistryLeft:AddButton('SimpleSpy V3',   function() RunRegisteredScript("SimpleSpy")     end)
     RegistryLeft:AddButton('Shaders',        function() RunRegisteredScript('Shaders')       end)
-    RegistryLeft:AddButton('Animation',      function() RunRegisteredScript('Animation')     end)
 
     -- ============================
     -- TAB: SETTINGS
@@ -3014,7 +2568,3 @@ end
         ThemeManager:ApplyToTab(Tabs.Settings)
         pcall(function() SaveManager:LoadAutoloadConfig() end)
     end)
-end
-
--- ==================== ЗАПУСК ОСНОВНОГО СКРИПТА СРАЗУ БЕЗ АВТОРИЗАЦИИ ====================
-LoadMainScript()
