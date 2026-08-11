@@ -1534,7 +1534,7 @@ end
 
     -- ==================== GUI — ПОЛНОСТЬЮ ПЕРЕПИСАН С KeyPicker ====================
     local Window = Library:CreateWindow({
-        Title        = 'Lunar Hub',
+        Title        = 'Lunar Hub | Universal',
         Center       = true,
         AutoShow     = true,
         TabPadding   = 8,
