@@ -1,5 +1,6 @@
 local Games = {
     [12196278347] = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Refirency_Caves_2.luau",
+    [126331002216562] = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Chasing%20lunar.luau",
 }
 
 local UniversalScript = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_Main"
