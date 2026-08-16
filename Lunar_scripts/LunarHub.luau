@@ -1,4 +1,4 @@
-local API_URL = "https://ripe-flies-make.loca.lt"
+local API_URL = "http://62.173.145.224:80"
 local DISCORD  = "https://discord.gg/cz6jG43AFs"
 
 local HttpService = game:GetService("HttpService")
