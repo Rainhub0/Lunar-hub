@@ -31,20 +31,18 @@ local Config = {
 
     AutoFarm = {
         Enabled = false,
-        WAIT_TIME = 2,
-        freezing = false,
-        frozenPos = nil,
+        WAIT_TIME = 2.5,
         Points = {
-            Vector3.new(-28.76, 60.60, 1374.39),
-            Vector3.new(-27.03, 41.26, 2144.08),
-            Vector3.new(-36.19, 31.49, 2920.32),
-            Vector3.new(-44.31, 58.97, 3688.11),
-            Vector3.new(-78.37, 47.65, 4457.04),
-            Vector3.new(-78.29, 56.08, 5229.65),
-            Vector3.new(-64.19, 50.15, 5996.36),
-            Vector3.new(-60.50, 55.68, 6761.03),
-            Vector3.new(-56.81, 47.82, 7538.23),
-            Vector3.new(-50.14, 53.03, 8320.32),
+            Vector3.new(-26.16, 61.08, 1334.11),
+            Vector3.new(-22.66, 54.96, 2071.91),
+            Vector3.new(-25.13, 44.95, 2856.83),
+            Vector3.new(-27.48, 34.38, 3606.69),
+            Vector3.new(-33.61, 43.05, 4405.09),
+            Vector3.new(-39.42, 51.40, 5160.88),
+            Vector3.new(-45.37, 59.05, 5935.28),
+            Vector3.new(-49.80, 65.03, 6711.00),
+            Vector3.new(-50.54, 56.73, 7440.14),
+            Vector3.new(-49.44, 52.34, 8230.73),
         }
     },
 
@@ -98,19 +96,8 @@ rebuildCache()
 Players.PlayerAdded:Connect(rebuildCache)
 Players.PlayerRemoving:Connect(rebuildCache)
 
--- ==================== AUTO FARM ====================
+-- ==================== AUTO FARM (новая логика) ====================
 local autoFarmThread = nil
-
-RunService.Heartbeat:Connect(function()
-    if not Config.AutoFarm.freezing or not Config.AutoFarm.frozenPos then return end
-    local char = LocalPlayer.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    local hum  = char and char:FindFirstChildOfClass("Humanoid")
-    if root and hum then
-        hum.PlatformStand = true
-        root.CFrame = CFrame.new(Config.AutoFarm.frozenPos)
-    end
-end)
 
 local function WaitForSpawn()
     while true do
@@ -125,6 +112,7 @@ local function startAutoFarm()
     if autoFarmThread then return end
     autoFarmThread = task.spawn(function()
         local points = Config.AutoFarm.Points
+        local speed = 10  -- скорость движения после телепорта
         while Config.AutoFarm.Enabled do
             WaitForSpawn()
             if not Config.AutoFarm.Enabled then break end
@@ -132,25 +120,44 @@ local function startAutoFarm()
 
             for i, pos in ipairs(points) do
                 if not Config.AutoFarm.Enabled then break end
-                Config.AutoFarm.frozenPos = pos
-                Config.AutoFarm.freezing = true
-                task.wait(Config.AutoFarm.WAIT_TIME)
+
+                local char = LocalPlayer.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                local hum  = char and char:FindFirstChildOfClass("Humanoid")
+                if not root or not hum then break end
+
+                -- Телепорт на точку и фиксация от падения
+                root.CFrame = CFrame.new(pos)
+                hum.PlatformStand = true  -- удерживаем в воздухе
+
+                -- Направление движения: к следующей точке, иначе вперёд по Z
+                local dir
+                if i < #points then
+                    dir = (points[i + 1] - pos).Unit
+                else
+                    dir = Vector3.new(0, 0, 1)
+                end
+
+                -- Движение вперёд с заданной скоростью в течение WAIT_TIME
+                local startTime = tick()
+                while tick() - startTime < Config.AutoFarm.WAIT_TIME do
+                    if not Config.AutoFarm.Enabled then break end
+                    local rootNow = getHRP(LocalPlayer)
+                    if not rootNow then break end
+                    rootNow.CFrame = rootNow.CFrame + dir * speed * task.wait()
+                end
             end
 
-            Config.AutoFarm.freezing = false
-            Config.AutoFarm.frozenPos = nil
-
+            -- После всех точек – убить персонажа
             local char = LocalPlayer.Character
             local hum = char and char:FindFirstChildOfClass("Humanoid")
             if hum then
-                hum.PlatformStand = false
+                hum.PlatformStand = false  -- разрешаем падение перед смертью
                 task.wait(0.2)
                 pcall(function() hum.Health = 0 end)
             end
             task.wait(2)
         end
-        Config.AutoFarm.freezing = false
-        Config.AutoFarm.frozenPos = nil
         autoFarmThread = nil
     end)
 end
@@ -161,12 +168,13 @@ local function stopAutoFarm()
         task.cancel(autoFarmThread)
         autoFarmThread = nil
     end
-    Config.AutoFarm.freezing = false
-    Config.AutoFarm.frozenPos = nil
+    -- Сброс PlatformStand
     local char = LocalPlayer.Character
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if hum then hum.PlatformStand = false end
 end
+
+-- (старый Heartbeat с заморозкой удалён – он больше не нужен)
 
 -- ==================== СПИДХАК (CFrame) ====================
 local speedCFrameConn
@@ -733,6 +741,7 @@ task.spawn(function()
     ThemeManager:ApplyToTab(Tabs.Settings)
     pcall(function() SaveManager:LoadAutoloadConfig() end)
 end)
+
 -- ==================== ВЫГРУЗКА ====================
 Library:OnUnload(function()
     stopAutoFarm()
