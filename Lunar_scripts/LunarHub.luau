@@ -1,4 +1,4 @@
-local API_URL = "https://isp-avoid-jackie-theory.trycloudflare.com"
+local API_URL = "https://inkjet-regular-shares-com.trycloudflare.com"
 local DISCORD  = "https://discord.gg/cz6jG43AFs"
 
 local HttpService = game:GetService("HttpService")
@@ -41,17 +41,18 @@ key_type  = "free"
 
 -- Верификация ключа на сервере
 local ok, resp = pcall(function()
-    local r = HttpService:RequestAsync({
-        Url    = API_URL .. "/verify",
-        Method = "POST",
-        Headers = {
-            ["Content-Type"]           = "application/json",
+    local body = HttpService:JSONEncode({ key = Key, hwid = hwid })
+    local r = HttpService:PostAsync(
+        API_URL .. "/verify",
+        body,
+        Enum.HttpContentType.ApplicationJson,
+        false,
+        {
             ["bypass-tunnel-reminder"] = "true",
-            ["User-Agent"]             = "LunarHub/1.0",
-        },
-        Body = HttpService:JSONEncode({ key = Key, hwid = hwid })
-    })
-    return HttpService:JSONDecode(r.Body)
+            ["User-Agent"] = "LunarHub/1.0",
+        }
+    )
+    return HttpService:JSONDecode(r)
 end)
 
 if not ok or not resp or not resp.ok then
