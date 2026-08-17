@@ -31,7 +31,7 @@ remaining = 0
 key_type  = "free"
 
 local ok, resp = pcall(function()
-    local r = http.request({
+    local r = request({
         Url    = API_URL .. "/verify",
         Method = "POST",
         Headers = { ["Content-Type"] = "application/json" },
