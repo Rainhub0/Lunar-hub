@@ -73,10 +73,10 @@ end)
 
 local Games = {
     [12196278347]     = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Refirency_Caves_2.luau",
-    [126331002216562] = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Chasing%20lunar.luau",
-    [6516141723]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Doors%20Lunar.luau",
-    [6839171747]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Doors%20Lunar.luau",
-    [537413528]       = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Build%20A%20Boat%20For%20Treasure%20Lunar.luau",
+    [126331002216562] = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Chasing.luau",
+    [6516141723]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau",
+    [6839171747]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau",
+    [537413528]       = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Build%20A%20Boat%20For%20Treasure%20Lunar.luau",
 }
 
 local url = Games[game.PlaceId]
