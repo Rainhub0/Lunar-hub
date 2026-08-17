@@ -1,4 +1,4 @@
-local API_URL = "https://default-matter-dean-casinos.trycloudflare.com"
+local API_URL = "https://lunar-hub.ru"
 local DISCORD  = "https://discord.gg/cz6jG43AFs"
 
 local HttpService = game:GetService("HttpService")
