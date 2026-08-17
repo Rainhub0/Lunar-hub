@@ -31,13 +31,13 @@ remaining = 0
 key_type  = "free"
 
 local ok, resp = pcall(function()
-    local body = HttpService:JSONEncode({ key = Key, hwid = hwid })
-    local r = HttpService:PostAsync(
-        API_URL .. "/verify",
-        body,
-        Enum.HttpContentType.ApplicationJson
-    )
-    return HttpService:JSONDecode(r)
+    local r = syn.request({
+        Url    = API_URL .. "/verify",
+        Method = "POST",
+        Headers = { ["Content-Type"] = "application/json" },
+        Body   = HttpService:JSONEncode({ key = Key, hwid = hwid })
+    })
+    return HttpService:JSONDecode(r.Body)
 end)
 
 if not ok then
