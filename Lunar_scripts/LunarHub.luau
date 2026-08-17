@@ -1,22 +1,15 @@
-local API_URL = "https://inkjet-regular-shares-com.trycloudflare.com"
+local API_URL = "https://default-matter-dean-casinos.trycloudflare.com"
 local DISCORD  = "https://discord.gg/cz6jG43AFs"
 
 local HttpService = game:GetService("HttpService")
 local LP          = game:GetService("Players").LocalPlayer
 
--- Проверяем что ключ передан
 if not Key or Key == "" or Key == "XXXX-XXXX-XXXX-XXXX" then
     LP:Kick("\n\n🌙 Lunar Hub\n━━━━━━━━━━━━━━━\n❌ Ключ не указан!\nПолучи ключ в Discord.\n━━━━━━━━━━━━━━━\n" .. DISCORD)
     return
 end
 
--- Получаем HWID
 local function getHWID()
-    local ok, id = pcall(function()
-        return game:GetService("RbxAnalyticsService"):GetClientId()
-    end)
-    if ok and id and id ~= "" then return id end
-
     local ok2, id2 = pcall(function()
         if not isfile("lhwid.dat") then
             local g = tostring(math.random(1e9, 9e9)) .. tostring(math.random(1e9, 9e9))
@@ -26,7 +19,6 @@ local function getHWID()
         return readfile("lhwid.dat")
     end)
     if ok2 and id2 then return id2 end
-
     return tostring(LP.UserId)
 end
 
@@ -34,28 +26,26 @@ local function kick(msg)
     LP:Kick("\n\n🌙 Lunar Hub\n━━━━━━━━━━━━━━━\n" .. msg .. "\n━━━━━━━━━━━━━━━\nDiscord: " .. DISCORD)
 end
 
--- Глобальные переменные
 hwid      = getHWID()
 remaining = 0
 key_type  = "free"
 
--- Верификация ключа на сервере
 local ok, resp = pcall(function()
     local body = HttpService:JSONEncode({ key = Key, hwid = hwid })
     local r = HttpService:PostAsync(
         API_URL .. "/verify",
         body,
-        Enum.HttpContentType.ApplicationJson,
-        false,
-        {
-            ["bypass-tunnel-reminder"] = "true",
-            ["User-Agent"] = "LunarHub/1.0",
-        }
+        Enum.HttpContentType.ApplicationJson
     )
     return HttpService:JSONDecode(r)
 end)
 
-if not ok or not resp or not resp.ok then
+if not ok then
+    kick("DEBUG: " .. tostring(resp))
+    return
+end
+
+if not resp or not resp.ok then
     local reason = (resp and resp.reason) or "CONNECTION_ERROR"
     local msgs = {
         INVALID_KEY      = "❌ Ключ недействителен или удалён.",
@@ -68,11 +58,9 @@ if not ok or not resp or not resp.ok then
     return
 end
 
--- Сохраняем данные глобально
 remaining = resp.remaining or 0
 key_type  = resp.key_type  or "free"
 
--- Сохраняем сессию на диск
 pcall(function()
     writefile("LunarHub_session.dat", HttpService:JSONEncode({
         key       = Key,
@@ -83,7 +71,6 @@ pcall(function()
     }))
 end)
 
--- Загружаем игровой скрипт по PlaceId
 local Games = {
     [12196278347]     = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Refirency_Caves_2.luau",
     [126331002216562] = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Chasing%20lunar.luau",
