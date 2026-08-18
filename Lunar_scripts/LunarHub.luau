@@ -37,7 +37,6 @@ local ok, resp = pcall(function()
         Headers = { ["Content-Type"] = "application/json" },
         Body   = HttpService:JSONEncode({ key = Key, hwid = hwid })
     })
-    kick("RAW: " .. tostring(r.StatusCode) .. " | " .. tostring(r.Body):sub(1, 100))
     return HttpService:JSONDecode(r.Body)
 end)
 
