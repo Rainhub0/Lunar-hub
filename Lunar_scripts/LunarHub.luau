@@ -61,6 +61,11 @@ end
 remaining = resp.remaining or 0
 key_type  = resp.key_type  or "free"
 LunarVerified = true
+_G.LunarVerified = true
+_G.Key = Key
+_G.key_type = key_type
+_G.remaining = remaining
+_G.hwid = hwid
 
 pcall(function()
     writefile("LunarHub_session.dat", HttpService:JSONEncode({
