@@ -68,7 +68,6 @@ local GameScripts = {
 
 local scriptName = GameScripts[game.PlaceId] or "Main"
 
--- Загружаем игровой скрипт
 local src
 local ok2, err2 = pcall(function()
     src = game:HttpGet(API_URL.."/script/"..scriptName.."?key="..Key)
@@ -92,6 +91,19 @@ game:GetService("StarterGui"):SetCore("SendNotification", {
 
 local fn, compErr = loadstring(src)
 if not fn then
+    -- Находим проблемную строку
+    local lineNum = tonumber(tostring(compErr):match(":(%d+):"))
+    if lineNum then
+        local lines = {}
+        for line in src:gmatch("[^\n]+") do
+            table.insert(lines, line)
+        end
+        warn("=== LUNAR HUB COMPILE ERROR ===")
+        warn("Строка " .. lineNum .. ": " .. (lines[lineNum] or "не найдена"))
+        warn("Предыдущая: " .. (lines[lineNum-1] or "—"))
+        warn("Следующая:  " .. (lines[lineNum+1] or "—"))
+        warn("================================")
+    end
     kick("Compile error: " .. tostring(compErr))
     return
 end
