@@ -91,24 +91,28 @@ game:GetService("StarterGui"):SetCore("SendNotification", {
 
 local fn, compErr = loadstring(src)
 if not fn then
-    -- Находим проблемную строку
     local lineNum = tonumber(tostring(compErr):match(":(%d+):"))
     if lineNum then
         local lines = {}
         for line in src:gmatch("[^\n]+") do
             table.insert(lines, line)
         end
-        warn("=== LUNAR HUB COMPILE ERROR ===")
+        warn("=== COMPILE ERROR ===")
         warn("Строка " .. lineNum .. ": " .. (lines[lineNum] or "не найдена"))
         warn("Предыдущая: " .. (lines[lineNum-1] or "—"))
         warn("Следующая:  " .. (lines[lineNum+1] or "—"))
-        warn("================================")
     end
-    kick("Compile error: " .. tostring(compErr))
+    warn("Compile error: " .. tostring(compErr))
     return
 end
 
+warn("=== Скрипт скомпилирован, запускаю... ===")
+warn("Первые 200 символов: " .. src:sub(1, 200))
+
 local runOk, runErr = pcall(fn)
 if not runOk then
-    kick("Run error: " .. tostring(runErr))
+    warn("=== RUN ERROR ===")
+    warn(tostring(runErr))
+else
+    warn("=== Скрипт выполнен успешно ===")
 end
