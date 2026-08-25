@@ -5,7 +5,7 @@ local HttpService = game:GetService("HttpService")
 local LP          = game:GetService("Players").LocalPlayer
 
 if not Key or Key == "" or Key == "XXXX-XXXX-XXXX-XXXX" then
-    LP:Kick("\n\n🌙 Lunar Hub\n━━━━━━━━━━━━━━━\n❌ Ключ не указан!\nПолучи ключ в Discord.\n━━━━━━━━━━━━━━━\n" .. DISCORD)
+    LP:Kick("\n\n🌙 Lunar Hub\n━━━━━━━━━━━━━━━\nKey not specified\nPaste key/get key in website\n━━━━━━━━━━━━━━━\n" .. DISCORD)
     return
 end
 
@@ -23,7 +23,7 @@ local function getHWID()
 end
 
 local function kick(msg)
-    LP:Kick("\n\n🌙 Lunar Hub\n━━━━━━━━━━━━━━━\n" .. msg .. "\n━━━━━━━━━━━━━━━\nDiscord: " .. DISCORD)
+    LP:Kick("\n\nLunar Hub\n━━━━━━━━━━━━━━━\n" .. msg .. "\n━━━━━━━━━━━━━━━\nDiscord: " .. DISCORD)
 end
 
 hwid      = getHWID()
@@ -48,11 +48,11 @@ end
 if not resp or not resp.ok then
     local reason = (resp and resp.reason) or "CONNECTION_ERROR"
     local msgs = {
-        INVALID_KEY      = "❌ Ключ недействителен или удалён.",
-        EXPIRED          = "⏰ Ключ истёк. Получи новый в Discord.",
-        HWID_MISMATCH    = "💻 HWID не совпадает. Напиши в Discord для сброса.",
-        MISSING_FIELDS   = "⚠️ Ошибка скрипта.",
-        CONNECTION_ERROR = "🌐 Не удалось подключиться к серверу.",
+        INVALID_KEY      = "Invalid key",
+        EXPIRED          = "The key has expired, get new in website",
+        HWID_MISMATCH    = "HWID mismatch, reset in discord.",
+        MISSING_FIELDS   = "Error, pls wait when delovers fix it",
+        CONNECTION_ERROR = "Server error, pls wait when delovers fix it",
     }
     kick(msgs[reason] or reason)
     return
@@ -73,16 +73,15 @@ pcall(function()
 end)
 
 local Games = {
-    [12196278347]     = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_scripts/Refirency_Caves_2.luau",
-    [126331002216562] = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Chasing.luau",
-    [6516141723]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau",
-    [6839171747]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau",
-    [537413528]       = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Build%20A%20Boat%20For%20Treasure%20Lunar.luau",
+    [12196278347]     = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/RC2.luau?token=GHSAT0AAAAAAED7DTHQTSKWWVOVPVOAJTR42UNKOKQ",
+    [6516141723]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau?token=GHSAT0AAAAAAED7DTHRQ4K7UJWNEAKWSA3C2UNKOCQ",
+    [6839171747]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau?token=GHSAT0AAAAAAED7DTHRQ4K7UJWNEAKWSA3C2UNKOCQ",
+    [537413528]       = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Build%20A%20Boat%20For%20Treasure%20Lunar.luau?token=GHSAT0AAAAAAED7DTHQLTVZNCZRZLEA7HGI2UNKNZQ",
 }
 
 local url = Games[game.PlaceId]
 if url then
     loadstring(game:HttpGet(url))()
 else
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_Main"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_Main?token=GHSAT0AAAAAAED7DTHQUW2M5XNDCFEHNXWG2UNKFYA"))()
 end
