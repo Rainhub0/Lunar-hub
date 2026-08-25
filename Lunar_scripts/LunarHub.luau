@@ -42,6 +42,12 @@ if not ok or not resp or not resp.ok then
     kick(msgs[reason] or reason) return
 end
 
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Lunar Hub",
+    Text = "✅ Key verified! Loading...",
+    Duration = 5,
+})
+
 remaining = resp.remaining or 0
 key_type  = resp.key_type  or "free"
 LunarVerified = true
@@ -57,3 +63,9 @@ local GameScripts = {
 local scriptName = GameScripts[game.PlaceId] or "Main"
 local src = game:HttpGet(API_URL.."/script/"..scriptName.."?key="..Key)
 loadstring(src)()
+
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Lunar Hub", 
+    Text = "✅ Game script loaded!",
+    Duration = 5,
+})
