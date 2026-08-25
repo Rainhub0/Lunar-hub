@@ -1,3 +1,4 @@
+local Key = "2A4728DE-4571D53D-CBDB8471-5C1D027B"
 local API_URL = "https://lunar-hub.ru"
 local DISCORD  = "https://discord.gg/cz6jG43AFs"
 
@@ -73,15 +74,15 @@ pcall(function()
 end)
 
 local Games = {
-    [12196278347]     = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/RC2.luau?token=GHSAT0AAAAAAED7DTHQTSKWWVOVPVOAJTR42UNKOKQ",
-    [6516141723]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau?token=GHSAT0AAAAAAED7DTHRQ4K7UJWNEAKWSA3C2UNKOCQ",
-    [6839171747]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau?token=GHSAT0AAAAAAED7DTHRQ4K7UJWNEAKWSA3C2UNKOCQ",
-    [537413528]       = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Build%20A%20Boat%20For%20Treasure%20Lunar.luau?token=GHSAT0AAAAAAED7DTHQLTVZNCZRZLEA7HGI2UNKNZQ",
+    [12196278347]     = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/RC2.luau?token=GHSAT0AAAAAAED7DTHR3WFJUEB44Y2CIXMS2UNLA6A",
+    [6516141723]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau?token=GHSAT0AAAAAAED7DTHRMZTIRCHBBLLLH36O2UNLAVQ",
+    [6839171747]      = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Doors%20Lunar.luau?token=GHSAT0AAAAAAED7DTHRMZTIRCHBBLLLH36O2UNLAVQ",
+    [537413528]       = "https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_place_script/Build%20A%20Boat%20For%20Treasure%20Lunar.luau?token=GHSAT0AAAAAAED7DTHR3H2UGSK2TSG3KKLQ2UNK77A",
 }
 
 local url = Games[game.PlaceId]
 if url then
     loadstring(game:HttpGet(url))()
 else
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_Main?token=GHSAT0AAAAAAED7DTHQUW2M5XNDCFEHNXWG2UNKFYA"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Rainhub0/Lunar-hub/refs/heads/main/Lunar_Main?token=GHSAT0AAAAAAED7DTHRTVAOOX7YLWBENU4U2UNLBDQ"))()
 end
