@@ -25,34 +25,40 @@ local function kick(msg)
 end
 
 hwid = getHWID()
+
 local ok, resp = pcall(function()
-    local r = request({ Url=API_URL.."/verify", Method="POST",
-        Headers={["Content-Type"]="application/json"},
-        Body=HttpService:JSONEncode({key=Key,hwid=hwid}) })
+    local r = request({
+        Url     = API_URL.."/verify",
+        Method  = "POST",
+        Headers = {["Content-Type"]="application/json"},
+        Body    = HttpService:JSONEncode({key=Key, hwid=hwid})
+    })
     return HttpService:JSONDecode(r.Body)
 end)
 
 if not ok or not resp or not resp.ok then
     local reason = (resp and resp.reason) or "CONNECTION_ERROR"
     local msgs = {
-        INVALID_KEY="Invalid key", EXPIRED="Key expired, get new in website",
-        HWID_MISMATCH="HWID mismatch, reset in discord.",
-        MISSING_FIELDS="Script error", CONNECTION_ERROR="Server error",
+        INVALID_KEY      = "Invalid key",
+        EXPIRED          = "Key expired, get new in website",
+        HWID_MISMATCH    = "HWID mismatch, reset in discord.",
+        MISSING_FIELDS   = "Script error",
+        CONNECTION_ERROR = "Server error",
     }
-    kick(msgs[reason] or reason) return
+    kick(msgs[reason] or reason)
+    return
 end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "Lunar Hub",
-    Text = "✅ Key verified! Loading...",
+    Text  = "✅ Key verified! Loading...",
     Duration = 5,
 })
 
-remaining = resp.remaining or 0
-key_type  = resp.key_type  or "free"
+remaining     = resp.remaining or 0
+key_type      = resp.key_type  or "free"
 LunarVerified = true
 
--- Загружаем игровой скрипт через сервер (токен не нужен)
 local GameScripts = {
     [12196278347] = "RC2",
     [6516141723]  = "Doors",
@@ -61,11 +67,36 @@ local GameScripts = {
 }
 
 local scriptName = GameScripts[game.PlaceId] or "Main"
-local src = game:HttpGet(API_URL.."/script/"..scriptName.."?key="..Key)
-loadstring(src)()
+
+-- Загружаем игровой скрипт
+local src
+local ok2, err2 = pcall(function()
+    src = game:HttpGet(API_URL.."/script/"..scriptName.."?key="..Key)
+end)
+
+if not ok2 then
+    kick("HttpGet error: " .. tostring(err2))
+    return
+end
+
+if not src or src == "" then
+    kick("Empty script: " .. scriptName)
+    return
+end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Lunar Hub", 
-    Text = "✅ Game script loaded!",
+    Title = "Lunar Hub",
+    Text  = "Loaded: " .. scriptName .. " (" .. #src .. " chars)",
     Duration = 5,
 })
+
+local fn, compErr = loadstring(src)
+if not fn then
+    kick("Compile error: " .. tostring(compErr))
+    return
+end
+
+local runOk, runErr = pcall(fn)
+if not runOk then
+    kick("Run error: " .. tostring(runErr))
+end
