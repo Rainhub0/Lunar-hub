@@ -1,4 +1,3 @@
-local Key = "2A4728DE-4571D53D-CBDB8471-5C1D027B"
 local API_URL = "https://lunar-hub.ru"
 local DISCORD  = "https://discord.gg/cz6jG43AFs"
 
