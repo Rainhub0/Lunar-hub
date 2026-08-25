@@ -6,7 +6,7 @@ local HttpService = game:GetService("HttpService")
 local LP          = game:GetService("Players").LocalPlayer
 
 if not Key or Key == "" or Key == "XXXX-XXXX-XXXX-XXXX" then
-    LP:Kick("\n\n🌙 Lunar Hub\n━━━━━━━━━━━━━━━\nKey not specified\nPaste key/get key in website\n━━━━━━━━━━━━━━━\n" .. DISCORD)
+    LP:Kick("\n\nLunar Hub\n━━━━━━━━━━━━━━━\nKey not specified\nPaste key/get key in website\n━━━━━━━━━━━━━━━\n" .. DISCORD)
     return
 end
 
