@@ -1,1 +1,0 @@
-local Status = Undetected -- idk if script detect then i set new status <3
